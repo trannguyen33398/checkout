@@ -9,22 +9,32 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import { cakeType, item } from './constant/interface';
+import { cakeType, item, customerType } from './constant/interface';
 import { apiDomain, getCalc} from './constant/api';
 
 function App() {
   const [customer, setCustomer] = React.useState('');
+  const [customerCode, setCustomerCode] = React.useState(0);
   const [cake, setCake] = React.useState('');
   const [amount, setAmount] = React.useState(0);
   const [items, setItems] = React.useState<item[]>([]);
   const handleChangeCustomer = (event: SelectChangeEvent) => {
-    setCustomer(event.target.value);
+    const customerName = event.target.value
+    const getCustomerCode : any =  Object.keys(customerType)
+    .filter((key) => key.includes(customerName))
+    .reduce((obj, key:any) => {
+        return Object.assign(obj, {
+          [key]: customerType[key]
+        });
+  }, {});
+    setCustomer(customerName);
+    setCustomerCode(getCustomerCode[customerName])
   };
   const handleChangeCake = (event: SelectChangeEvent) => {
     setCake(event.target.value);
   };
   const calc = async () =>{
-    const params = {customer: customer, items: items}
+    const params = {customer: customerCode, items: items}
     const result = await axios.post(`${apiDomain}/${getCalc}`,params)
     alert(`Total fee is: ${result['data']}`)
   }
@@ -55,9 +65,9 @@ function App() {
             onChange={handleChangeCustomer}
           >
             <MenuItem value={'DEFAULT'}>Customer</MenuItem>
-            <MenuItem value={'FACEOOK'}>Facebook</MenuItem>
-            <MenuItem value={'AMAZONE'}>Amazon</MenuItem>
-            <MenuItem value={'MiCROSOFT'}>Microsoft</MenuItem>
+            <MenuItem value={'FACEBOOK'}>Facebook</MenuItem>
+            <MenuItem value={'AMAZON'}>Amazon</MenuItem>
+            <MenuItem value={'MICROSOFT'}>Microsoft</MenuItem>
           </Select>
         </FormControl>
       </Box>
